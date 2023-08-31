@@ -1,9 +1,9 @@
-import datetime
 from typing import AsyncGenerator
 
 from fastapi import Depends
 from fastapi_users.db import SQLAlchemyUserDatabase
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
+from sqlalchemy import Column, String, Boolean, Integer
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
@@ -16,8 +16,13 @@ class Base(DeclarativeBase):
     pass
 
 
-class User(SQLAlchemyBaseUserTable[int], Base):
-    registered_at: datetime.date
+class User(SQLAlchemyBaseUserTable, Base):
+    __tablename__ = "users"
+    name = Column(String, unique=True)
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    is_active = Column(Boolean, default=True)
 
 
 engine = create_async_engine(DATABASE_URL)
